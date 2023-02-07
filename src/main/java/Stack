@@ -1,0 +1,47 @@
+import DoublyLinkedList.DoublyLinkedList;
+
+import java.util.ArrayList;
+
+public class Stack<T> {
+    private DoublyLinkedList<T> dataList;
+
+    public Stack() {
+        dataList = new DoublyLinkedList<T>();
+    }
+
+    public void push(T value) {
+        dataList.append(value);
+    }
+
+    public int size() {
+        return dataList.listLength();
+    }
+
+    public T pop() {
+        if (this.size() == 0) {
+            throw new NullPointerException("Stack is empty - nothing to delete.");
+        }
+        return dataList.delete(dataList.listLength() - 1);
+    }
+
+    public Object[] pop(int n) {
+        if (this.size() == 0) {
+            throw new NullPointerException("Stack is empty - nothing to delete.");
+        }
+        Object[] deletedValues = new Object[n];
+
+        for(int i = 0; i < n; i++) {
+            T value = this.pop();
+            deletedValues[i] = value;
+        }
+
+        return deletedValues;
+    }
+
+    public T peek() {
+        if (this.size() == 0) {
+            throw new NullPointerException("Stack is empty - no elements to show.");
+        }
+        return dataList.searchListReverse(this.size() - 1);
+    }
+}
