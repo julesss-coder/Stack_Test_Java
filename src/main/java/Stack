@@ -24,6 +24,7 @@ public class Stack<T> {
         return dataList.delete(dataList.listLength() - 1);
     }
 
+    // FIXME Add exception for when n > list length.
     public Object[] pop(int n) {
         if (this.size() == 0) {
             throw new NullPointerException("Stack is empty - nothing to delete.");
