@@ -1,29 +1,24 @@
-import DoublyLinkedList.DoublyLinkedList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // TODO Fragen:
-// - Brauche ich zum Zweck dieses Tests eine Main-Klasse im `main`-Ordner?
-// - Muss ich auch `DoublyLinkedList` testen? Oder kann ich davon ausgehen, dass diese Klasse schon getestet ist? D.h. kann ich die Methoden von `DoublyLinkedList` aufrufen, um die Methoden von `Stack` zu testen?
-// - Inwieweit greife ich auf das, was in `DoublyLinkedList` passiert, zu?
-// - Was muss ich beim Testen beachten, wenn meine Implementation von Stack mit Generics arbeitet?
-// - Should I create a test object within each test method, or a `public` object?
+// - What do I have to do differently when testing a class that uses generics?
     // - Does it matter what data type the test object is, given that Stack is implemented using generics?
-// - @BeforeEach: Do I have to test `setUp()` it with all data types, due to using generics?
+    // - @BeforeEach: Do I have to test `setUp()` it with all data types, due to using generics?
+// - Should I create a test object within each test method, or a `public` object?
 // - How to come up with all necessary test cases?
     // - More specifically: When testing an add() method, with how many elements do I have to test it? 0, 1, and > 1 seems reasonable to me. More doesn't seem provide any benefit.
-// - Wie nenne ich die Testmethoden einer ueberladenen Methode am besten? popTest, popTest1?
+// - How to best name the test methods for an overloaded method? popTest, popTest1?
+// How can I use a method reference when referring to an overloaded method? E.g. testStack::pop to call pop(int n).
 
-// TODO
-// - Use all methods in all test cases, if it makes sense. E.g. to test push, check with size() that the list length is correct.
-// Check with pop()/peek()/(pop(n)?) and afterwards peek() that the correct element was pushed.
 public class TestStack<T> {
-    private Stack<T> myList;
+    private Stack<T> myStack;
 
     @BeforeEach
     void setUp() {
-        myList = new Stack<>();
+        myStack = new Stack<>();
     }
 
     // TEST: 1. Hat die Liste einen Knoten mehr als vorher, wenn `push()` ausgefuehrt wird?
@@ -31,26 +26,17 @@ public class TestStack<T> {
     // Edge cases: ?
     @Test
     void pushTest() {
-        Stack<Integer> testList = new Stack<>();
+        Stack<Integer> testStack = new Stack<>();
 
         // Case: number of elements === 0
-        assertEquals(0, testList.size());
-
-        // Case: number of elements === 1
-        testList.push(0);
-        assertEquals(1, testList.size());
-        // Check that correct value is in last element
-        assertEquals(0, testList.peek());
-        assertEquals(0, testList.pop());
+        assertEquals(0, testStack.size());
 
         // Case: number of elements > 1
-        testList.push(0);
-        testList.push(1);
-        testList.push(2);
-        assertEquals(3, testList.size());
+        testStack.push(1);
+        testStack.push(2);
+        assertEquals(2, testStack.size());
         // Check that correct value is in last element
-        assertEquals(2, testList.peek());
-        assertEquals(2, testList.pop());
+        assertEquals(2, testStack.peek());
     }
 
     // TEST: Entspricht der Rueckgabewert der Anzahl der Listenelemente?
@@ -61,33 +47,22 @@ public class TestStack<T> {
         // - Leere Liste
     @Test
     void sizeTest() {
-        // TODO Ansatz: Rufe `listLength()` aus `DoublyLinkedList` auf und vergleiche mich Rueckgabewert von `size()` aus `Stack`
-        // TODO Stimmt dieser Ansatz grundsaetzlich?
-        // TODO Oder muss ich mehrere Testlisten erstellen, deren Laenge ich kenne, und diesen mit dem Rueckgabewert von `size()` vergleichen?
-        // Problem: Ich kann nicht auf die Methode `size()` zugreifen.
-//        assertEquals(myList.listLength(), /* return value of call to size() */ );
-        // =============
-        // Create test list
         Stack<Integer> testStack = new Stack<>();
 
-        // Test `size()` after adding elements
         // Case: Number of elements === 0
         assertEquals(0, testStack.size());
 
         // Case: Number of elements > 0
-        testStack.push(0);
         testStack.push(1);
         testStack.push(2);
         testStack.push(3);
-        assertEquals(4, testStack.size());
-
-        // Test `size()` after deleting an element
-        testStack.pop();
         assertEquals(3, testStack.size());
+
+        // Case: Deleting 1 element
         testStack.pop();
         assertEquals(2, testStack.size());
 
-        // Test `size()` after deleting several elements
+        // Case: Deleting > 1 elements
         testStack.pop(2);
         assertEquals(0, testStack.size());
     }
@@ -97,22 +72,106 @@ public class TestStack<T> {
     2. Does it delete the last element?
      */
     @Test
-    void popTest() {    }
+    void popTest() {
+        Stack<Integer> testStack = new Stack<>();
 
-    // Deal with empty list
-    @Test
-    void exceptionPopTest() {}
+        // Case: Number of elements === 0
+        testStack.push(0);
+        // Check if correct value is returned
+        assertEquals(0, testStack.pop());
+        // Check if list size is decremented by one
+        assertEquals(0, testStack.size());
 
-    @Test
-    void popTest2() {}
+        // Case: Number of elements > 1
+        testStack.push(1);
+        testStack.push(2);
+        assertEquals(2, testStack.pop());
+        assertEquals(1, testStack.size());
+    }
 
-    // Deal with n > number of list elements
+    /* TEST
+    - Does it throw a NullPointerException when pop is called on empty stack?
+    - Is list size still the same as before?
+     */
     @Test
-    void exceptionPopTest2() {}
+    void exceptionPopTest() {
+        Stack<Integer> testList = new Stack<>();
+        // Using method reference instead of lambda expression, as pop() is a known function.
+        assertThrows(NullPointerException.class, testList::pop);
+        assertEquals(0, testList.size());
+    }
 
+    /*
+    TEST:
+    - Does it return an Object array with
+        - the deleted values
+        - the correct number of elements?
+    - Does it delete the correct values?
+    - Is the list size decremented accordingly?
+     */
     @Test
-    void peekTest() {}
+    void popTest2() {
+        Stack<Integer> testStack = new Stack<>();
+        testStack.push(0);
+        testStack.push(1);
+        testStack.push(2);
+        testStack.push(3);
+        testStack.push(4);
+        testStack.pop(2);
+        // Check list length
+        assertEquals(3, testStack.size());
+        // Check new last element of list
+        assertEquals(2, testStack.peek());
+        // Check that value of deleted element is correct and in correct position
+        assertEquals(1, testStack.pop(2)[1]);
+        assertEquals(1, testStack.size());
+        // FIXME Check that the return value is an Object array
+        // ?
+    }
 
+    /*
+    TEST:
+    - Does it throw a NullPointerException when pop(n) is called on empty stack?
+    - Does it throw a NullPointerException when pop(n) is called on stack where size < n?
+    - Is list size still the same as before?
+     */
     @Test
-    void exceptionPeekTest() {}
+    void exceptionPopTest2() {
+        Stack<Integer> testStack = new Stack<>();
+
+        assertThrows(NullPointerException.class, () -> testStack.pop(1));
+
+        testStack.push(0);
+        testStack.push(1);
+        assertThrows(NullPointerException.class, () -> testStack.pop(3));
+    }
+
+    /*
+    TEST:
+    - Should return value of last element
+     */
+    @Test
+    void peekTest() {
+        Stack<Integer> testStack = new Stack<>();
+        testStack.push(0);
+        assertEquals(0, testStack.peek());
+
+        testStack.push(1);
+        testStack.push(2);
+        assertEquals(2, testStack.peek());
+
+        // Check that peek() works after an element is deleted.
+        testStack.pop();
+        assertEquals(1, testStack.peek());
+    }
+
+    /*
+    TEST:
+    - Should throw exception if peek() is called on empty stack.
+     */
+    @Test
+    void exceptionPeekTest() {
+        Stack<Integer> testStack = new Stack<>();
+        assertThrows(NullPointerException.class, testStack::peek);
+    }
 }
