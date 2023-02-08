@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 // - How to come up with all necessary test cases?
     // - More specifically: When testing an add() method, with how many elements do I have to test it? 0, 1, and > 1 seems reasonable to me. More doesn't seem provide any benefit.
 // - How to best name the test methods for an overloaded method? popTest, popTest1?
+    // Alex: Name von Testmethode fuer ueberladene Methode: einfach verstaendlich, es gibt keine Konvention.
 // How can I use a method reference when referring to an overloaded method? E.g. testStack::pop to call pop(int n).
 
 public class TestStack<T> {
@@ -21,9 +22,6 @@ public class TestStack<T> {
         myStack = new Stack<>();
     }
 
-    // TEST: 1. Hat die Liste einen Knoten mehr als vorher, wenn `push()` ausgefuehrt wird?
-            // 2. Wurden die richtigen Daten in der richtigen Reihenfolge hinzugefuegt?
-    // Edge cases: ?
     @Test
     void pushTest() {
         Stack<Integer> testStack = new Stack<>();
@@ -39,12 +37,6 @@ public class TestStack<T> {
         assertEquals(2, testStack.peek());
     }
 
-    // TEST: Entspricht der Rueckgabewert der Anzahl der Listenelemente?
-            // 1. nach dem Hinzufuegen von Elementen?
-            // 2. nach dem Loeschen von Elementen?
-            // 3. nach dem Loeschen mehrerer Elemente gleichzeitig?
-    // Edge cases:
-        // - Leere Liste
     @Test
     void sizeTest() {
         Stack<Integer> testStack = new Stack<>();
@@ -67,10 +59,6 @@ public class TestStack<T> {
         assertEquals(0, testStack.size());
     }
 
-    /* TEST:
-    1. Does it return the value of the last element?
-    2. Does it delete the last element?
-     */
     @Test
     void popTest() {
         Stack<Integer> testStack = new Stack<>();
@@ -89,26 +77,15 @@ public class TestStack<T> {
         assertEquals(1, testStack.size());
     }
 
-    /* TEST
-    - Does it throw a NullPointerException when pop is called on empty stack?
-    - Is list size still the same as before?
-     */
     @Test
     void exceptionPopTest() {
         Stack<Integer> testList = new Stack<>();
         // Using method reference instead of lambda expression, as pop() is a known function.
-        assertThrows(NullPointerException.class, testList::pop);
+        Exception exception = assertThrows(NullPointerException.class, testList::pop);
+        assertEquals("Stack is empty - nothing to delete.", exception.getMessage());
         assertEquals(0, testList.size());
     }
 
-    /*
-    TEST:
-    - Does it return an Object array with
-        - the deleted values
-        - the correct number of elements?
-    - Does it delete the correct values?
-    - Is the list size decremented accordingly?
-     */
     @Test
     void popTest2() {
         Stack<Integer> testStack = new Stack<>();
@@ -116,40 +93,32 @@ public class TestStack<T> {
         testStack.push(1);
         testStack.push(2);
         testStack.push(3);
-        testStack.push(4);
-        testStack.pop(2);
+
+        Object[] poppedArray = testStack.pop(2);
+        // Check that the returned Object array is the correct length
+        assertEquals(2, poppedArray.length);
+
         // Check list length
-        assertEquals(3, testStack.size());
+        assertEquals(2, testStack.size());
         // Check new last element of list
-        assertEquals(2, testStack.peek());
+        assertEquals(1, testStack.peek());
         // Check that value of deleted element is correct and in correct position
-        assertEquals(1, testStack.pop(2)[1]);
-        assertEquals(1, testStack.size());
-        // FIXME Check that the return value is an Object array
-        // ?
+        assertEquals(0, testStack.pop(2)[1]);
+        assertEquals(0, testStack.size());
     }
 
-    /*
-    TEST:
-    - Does it throw a NullPointerException when pop(n) is called on empty stack?
-    - Does it throw a NullPointerException when pop(n) is called on stack where size < n?
-    - Is list size still the same as before?
-     */
     @Test
     void exceptionPopTest2() {
         Stack<Integer> testStack = new Stack<>();
 
-        assertThrows(NullPointerException.class, () -> testStack.pop(1));
+        Exception exception = assertThrows(NullPointerException.class, () -> testStack.pop(1));
+        assertEquals("Stack is empty - nothing to delete.", exception.getMessage());
 
         testStack.push(0);
         testStack.push(1);
         assertThrows(NullPointerException.class, () -> testStack.pop(3));
     }
 
-    /*
-    TEST:
-    - Should return value of last element
-     */
     @Test
     void peekTest() {
         Stack<Integer> testStack = new Stack<>();
@@ -165,13 +134,10 @@ public class TestStack<T> {
         assertEquals(1, testStack.peek());
     }
 
-    /*
-    TEST:
-    - Should throw exception if peek() is called on empty stack.
-     */
     @Test
     void exceptionPeekTest() {
         Stack<Integer> testStack = new Stack<>();
-        assertThrows(NullPointerException.class, testStack::peek);
+        Exception exception = assertThrows(NullPointerException.class, testStack::peek);
+        assertEquals("Stack is empty - no elements to show.", exception.getMessage());
     }
 }
