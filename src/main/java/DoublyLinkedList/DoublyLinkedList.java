@@ -15,7 +15,7 @@ public class DoublyLinkedList<T> {
     public DoublyLinkedList() {}
 
     public void append(T value) {
-        ListNode<T> node = new ListNode(value);
+        ListNode<T> node = new ListNode<T>(value); // 8.2.2023: Added <T>
         if (this.head == null) {
             this.head = node;
             this.tail = node;
